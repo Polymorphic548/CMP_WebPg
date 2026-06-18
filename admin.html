@@ -345,7 +345,6 @@ async function loadReports(){
           <div class="report-actions">
             ${d.status!=='reviewed'?`<button class="btn btn-blue" onclick="updateReportStatus('${doc.id}','reviewed')">✓ Mark Reviewed</button>`:''}
             ${d.status!=='resolved'?`<button class="btn btn-green" onclick="updateReportStatus('${doc.id}','resolved')">✅ Mark Resolved</button>`:''}
-            <button class="btn btn-red" onclick="deleteReport('${doc.id}')">🗑 Delete</button>
           </div>
         </div>`;
     });
@@ -363,16 +362,6 @@ async function updateReportStatus(docId,status){
     loadReports();
   }catch(e){
     alert('Failed to update report: '+e.message);
-  }
-}
-
-async function deleteReport(docId){
-  if(!confirm('Are you sure you want to delete this report? This cannot be undone.'))return;
-  try{
-    await db.collection('reports').doc(docId).delete();
-    loadReports();
-  }catch(e){
-    alert('Failed to delete report: '+e.message);
   }
 }
 
@@ -397,30 +386,19 @@ async function loadAllVolunteers(){
         <td>${escHtml(d.contact)}</td>
         <td>${escHtml(d.campaignName||d.campaignId)}</td>
         <td>${time}</td>
-        <td><button class="btn btn-red" style="padding:4px 10px;font-size:0.78rem;" onclick="deleteVolunteer('${doc.id}')">Remove</button></td>
       </tr>`;
     });
 
     container.innerHTML=`
       <div class="vol-table-wrapper">
         <table class="vol-table">
-          <thead><tr><th>Name</th><th>Contact</th><th>Campaign</th><th>Registered</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Name</th><th>Contact</th><th>Campaign</th><th>Registered</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
   }catch(e){
     console.error('Error loading volunteers:',e);
     document.getElementById('volunteerContent').innerHTML='<div class="empty-state"><div class="icon">⚠️</div>Failed to load volunteers. Check Firebase configuration.</div>';
-  }
-}
-
-async function deleteVolunteer(docId){
-  if(!confirm('Remove this volunteer registration?'))return;
-  try{
-    await db.collection('volunteers').doc(docId).delete();
-    loadAllVolunteers();
-  }catch(e){
-    alert('Failed to remove volunteer: '+e.message);
   }
 }
 
