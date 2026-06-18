@@ -720,11 +720,13 @@ function wmoDesc(code){
   return wmoDescriptions[code]||"Cloudy";
 }
 
-async function fetchWeather(lat,lon){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,precipitation,weather_code,relative_humidity_2m,wind_speed_10m&wind_speed_unit=kmh&timezone=Asia/Kolkata`;
+async function fetchWeatherForLocations(localities) {
+  const lats = localities.map(l => l.lat).join(',');
+  const lons = localities.map(l => l.lon).join(',');
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,apparent_temperature,precipitation,weather_code,relative_humidity_2m,wind_speed_10m&wind_speed_unit=kmh&timezone=Asia/Kolkata`;
   const r=await fetch(url);
   const d=await r.json();
-  return d.current;
+  return Array.isArray(d) ? d.map(loc => loc.current) : [d.current];
 }
 
 function tempClass(t){
@@ -766,15 +768,22 @@ async function loadWeather(){
   const btn=document.getElementById('refreshBtn');
   btn.disabled=true;btn.textContent='Loading...';
   grid.innerHTML=LOCALITIES.map(l=>buildSkeleton(l.name)).join('');
-  const results=await Promise.allSettled(LOCALITIES.map(l=>fetchWeather(l.lat,l.lon)));
-  grid.innerHTML='';
-  results.forEach((r,i)=>{
-    if(r.status==='fulfilled'){
-      grid.innerHTML+=buildCard(LOCALITIES[i],r.value);
-    } else {
-      grid.innerHTML+=`<div class="weather-card"><div class="wc-name">${LOCALITIES[i].name}</div><div style="color:var(--muted);font-size:.85rem;margin-top:8px;">Data unavailable</div></div>`;
-    }
-  });
+  try {
+    const results = await fetchWeatherForLocations(LOCALITIES);
+    grid.innerHTML='';
+    results.forEach((currentData, i)=>{
+      if(currentData){
+        grid.innerHTML+=buildCard(LOCALITIES[i], currentData);
+      } else {
+        grid.innerHTML+=`<div class="weather-card"><div class="wc-name">${LOCALITIES[i].name}</div><div style="color:var(--muted);font-size:.85rem;margin-top:8px;">Data unavailable</div></div>`;
+      }
+    });
+  } catch(e) {
+    grid.innerHTML='';
+    LOCALITIES.forEach(l => {
+      grid.innerHTML+=`<div class="weather-card"><div class="wc-name">${l.name}</div><div style="color:var(--muted);font-size:.85rem;margin-top:8px;">Data unavailable</div></div>`;
+    });
+  }
   btn.disabled=false;btn.textContent='↻ Refresh Weather Data';
 }
 
@@ -865,6 +874,11 @@ async function submitReport(){
   const reporterName=document.getElementById('reporterName').value.trim()||'Anonymous';
   const contact=document.getElementById('reporterContact').value.trim();
 
+  if (contact && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contact) && !/^\+?\d{10,14}$/.test(contact)) {
+    showToast('Please enter a valid email or phone number.','error');
+    return;
+  }
+
   if(!loc){showToast('Please enter a location name.','error');return;}
   if(!type){showToast('Please select a pollution type.','error');return;}
   if(!selectedSeverity){showToast('Please select a severity level.','error');return;}
@@ -878,9 +892,11 @@ async function submitReport(){
   try{
     const photoURLs=[];
     for(let i=0;i<uploadedFiles.length;i++){
-      // Bypassing Firebase Storage (and Credit Card requirements)
-      // by saving Base64 image strings directly into the completely free Realtime Database!
-      photoURLs.push(uploadedFiles[i].data);
+      const file = uploadedFiles[i].file;
+      const fileRef = storage.ref().child('reports/' + Date.now() + '_' + file.name);
+      await fileRef.put(file);
+      const url = await fileRef.getDownloadURL();
+      photoURLs.push(url);
     }
 
     submitBtn.textContent='Saving report...';
@@ -1016,6 +1032,10 @@ async function submitRegistration(){
   const campaignTitle=document.getElementById('modalCampaignName').textContent;
   if(!name){showToast('Please enter your name.','error');return;}
   if(!contact){showToast('Please enter your phone or email.','error');return;}
+  if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contact) && !/^\+?\d{10,14}$/.test(contact)) {
+    showToast('Please enter a valid email or phone number.','error');
+    return;
+  }
 
   const btn=document.getElementById('regSubmitBtn');
   btn.disabled=true;

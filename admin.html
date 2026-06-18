@@ -311,16 +311,20 @@ async function loadReports(){
     document.getElementById('statReports').textContent=snap.size;
 
     let pending=0;
+    snap.forEach(doc=>{
+      if(doc.data().status==='pending') pending++;
+    });
+    document.getElementById('statPending').textContent=pending;
+
     if(snap.empty){
       container.innerHTML='<div class="empty-state"><div class="icon">📭</div>No reports submitted yet.</div>';
-      document.getElementById('statPending').textContent='0';
       return;
     }
 
     container.innerHTML='';
-    snap.forEach(doc=>{
+    const docsToRender = snap.docs.slice(0, 50);
+    docsToRender.forEach(doc=>{
       const d=doc.data();
-      if(d.status==='pending')pending++;
 
       const time=d.timestamp?d.timestamp.toDate().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Unknown time';
       const photos=(d.photoURLs||[]).map(url=>`<img src="${url}" alt="Report photo" onclick="window.open('${url}','_blank')">`).join('');
@@ -349,7 +353,6 @@ async function loadReports(){
         </div>`;
     });
 
-    document.getElementById('statPending').textContent=pending;
   }catch(e){
     console.error('Error loading reports:',e);
     document.getElementById('reportList').innerHTML='<div class="empty-state"><div class="icon">⚠️</div>Failed to load reports. Check Firebase configuration.</div>';
@@ -378,7 +381,8 @@ async function loadAllVolunteers(){
     }
 
     let rows='';
-    snap.forEach(doc=>{
+    const docsToRender = snap.docs.slice(0, 50);
+    docsToRender.forEach(doc=>{
       const d=doc.data();
       const time=d.registeredAt?d.registeredAt.toDate().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'—';
       rows+=`<tr>
