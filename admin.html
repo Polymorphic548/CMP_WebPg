@@ -32,7 +32,7 @@
   --text:#e0efe5;--muted:#8fa898;
   --shadow:0 8px 32px rgba(0,0,0,0.4);
 }
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0;overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0;overflow-x:hidden;display:flex;flex-direction:column;}
 
 /* Glowing Orbs for Dark Mode */
 body::before, body::after {
@@ -95,20 +95,20 @@ body::after {
 .main{max-width:1200px;margin:0 auto;padding:28px 24px;display:none;}
 
 /* Tabs */
-.admin-tabs-container{text-align:center;margin-bottom:32px;}
-.admin-tabs{display:inline-flex;gap:4px;background:rgba(255,255,255,0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:6px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.2);box-shadow:var(--shadow);}
+.admin-tabs-container{margin:0;}
+.admin-tabs{display:inline-flex;background:var(--surface);border-radius:50px;padding:8px;border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 [data-theme="dark"] .admin-tabs{background:rgba(15,23,35,0.5);border-color:rgba(255,255,255,0.08);}
 .admin-tab{padding:10px 24px;font-size:0.95rem;font-weight:600;color:var(--muted);cursor:pointer;border-radius:40px;border:none;background:transparent;transition:all 0.2s ease;}
 .admin-tab.active{background:var(--green);color:#fff;}
 .admin-tab:hover:not(.active){background:rgba(0,0,0,0.05);color:var(--text);}
 [data-theme="dark"] .admin-tab:hover:not(.active){background:rgba(255,255,255,0.05);color:#fff;}
 
-/* Stats strip */
-.stats-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:32px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);text-align:center;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:transform 0.25s;}
-.stat-card:hover{transform:translateY(-4px);}
-.stat-num{font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:700;color:var(--green);line-height:1;}
-.stat-label{font-size:0.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:8px;}
+/* Dashboard Controls */
+.dashboard-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;gap:24px;}
+.stats-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:36px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:14px 40px;box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);margin:0;}
+.stat-card{display:flex;align-items:baseline;gap:12px;}
+.stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green);line-height:1;}
+.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
 
 /* Section */
 .admin-section{display:none;}
@@ -160,14 +160,18 @@ body::after {
 .empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:0.8;}
 
 /* Footer */
-.footer{background:var(--text);color:rgba(255,255,255,0.7);text-align:center;padding:32px 24px;font-size:0.85rem;margin-top:60px;transition:background var(--transition);}
+.footer{background:var(--text);color:rgba(255,255,255,0.7);text-align:center;padding:12px 24px;font-size:0.8rem;margin-top:auto;transition:background var(--transition);}
 [data-theme="dark"] .footer{background:#0a1210;}
 .footer a{color:rgba(255,255,255,0.9);text-decoration:none;}
 
 /* Responsive */
+@media(max-width:1100px){
+  .dashboard-controls{flex-direction:column;align-items:stretch;gap:16px;}
+  .admin-tabs-container{text-align:center;}
+}
 @media(max-width:640px){
   .report-header{flex-direction:column;}
-  .stats-strip{grid-template-columns:1fr 1fr;}
+  .stats-strip{flex-direction:column;border-radius:24px;padding:16px 24px;align-items:flex-start;gap:12px;}
   .admin-tabs{width:90%;max-width:100%;overflow-x:auto;padding:6px;justify-content:flex-start;}
   .admin-tab{padding:8px 16px;font-size:0.85rem;}
   .vol-table-wrapper{overflow-x:auto;}
@@ -200,30 +204,32 @@ body::after {
 
 <!-- Main Admin Content (hidden until authenticated) -->
 <div class="main" id="adminMain">
+  
+  <div class="dashboard-controls">
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-num" id="statReports">—</div>
+        <div class="stat-label">Total Reports</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statPending">—</div>
+        <div class="stat-label">Pending Review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statVolunteers">—</div>
+        <div class="stat-label">Total Volunteers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statCampaigns">4</div>
+        <div class="stat-label">Active Campaigns</div>
+      </div>
+    </div>
 
-  <div class="stats-strip">
-    <div class="stat-card">
-      <div class="stat-num" id="statReports">—</div>
-      <div class="stat-label">Total Reports</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statPending">—</div>
-      <div class="stat-label">Pending Review</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statVolunteers">—</div>
-      <div class="stat-label">Total Volunteers</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statCampaigns">4</div>
-      <div class="stat-label">Active Campaigns</div>
-    </div>
-  </div>
-
-  <div class="admin-tabs-container">
-    <div class="admin-tabs">
-      <div class="admin-tab active" onclick="switchAdminTab('reports')">📍 Reports</div>
-      <div class="admin-tab" onclick="switchAdminTab('volunteers')">👥 Volunteers</div>
+    <div class="admin-tabs-container">
+      <div class="admin-tabs">
+        <div class="admin-tab active" onclick="switchAdminTab('reports')">📍 Reports</div>
+        <div class="admin-tab" onclick="switchAdminTab('volunteers')">👥 Volunteers</div>
+      </div>
     </div>
   </div>
 
