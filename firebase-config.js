@@ -13,12 +13,14 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "000000000000",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDarjkNZ2nrlgmcqUdhNeSHOiZbPBDUOOQ",
+  authDomain: "ecotrack-goregaon.firebaseapp.com",
+  databaseURL: "https://ecotrack-goregaon-default-rtdb.firebaseio.com",
+  projectId: "ecotrack-goregaon",
+  storageBucket: "ecotrack-goregaon.firebasestorage.app",
+  messagingSenderId: "1098723522065",
+  appId: "1:1098723522065:web:d022f836c125ea2872e3b0",
+  measurementId: "G-E791KMHFBZ"
 };
 
 // Initialize Firebase
