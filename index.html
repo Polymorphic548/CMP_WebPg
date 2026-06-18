@@ -876,14 +876,11 @@ async function submitReport(){
   submitBtn.textContent='Uploading photos...';
 
   try{
-    const timestamp=Date.now();
     const photoURLs=[];
     for(let i=0;i<uploadedFiles.length;i++){
-      submitBtn.textContent='Uploading photo '+(i+1)+' of '+uploadedFiles.length+'...';
-      const ref=storage.ref('reports/'+timestamp+'/'+uploadedFiles[i].name);
-      await ref.putString(uploadedFiles[i].data,'data_url');
-      const url=await ref.getDownloadURL();
-      photoURLs.push(url);
+      // Bypassing Firebase Storage (and Credit Card requirements)
+      // by saving Base64 image strings directly into the completely free Realtime Database!
+      photoURLs.push(uploadedFiles[i].data);
     }
 
     submitBtn.textContent='Saving report...';
