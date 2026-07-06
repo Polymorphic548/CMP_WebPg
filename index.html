@@ -125,7 +125,7 @@ body[data-theme="dark"]::after {
   top:20px;
   z-index:100;
   transition:all var(--transition);
-  margin: 0 auto 20px auto;
+  margin: 40px auto 20px auto;
   max-width: fit-content;
   border-radius: 50px;
   box-shadow: var(--shadow);
@@ -339,7 +339,7 @@ body[data-theme="dark"]::after {
   <div class="header-inner">
     <div class="logo">Eco<span>Green</span> Mumbai</div>
     <nav class="nav">
-      <a href="#hotspots" class="active">Hotspots</a>
+      <a href="#hotspots" class="active">Outreach Map</a>
       <a href="#report">Submit Feedback</a>
       <a href="#composting">Composting</a>
       <div class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle dark mode"></div>
@@ -355,7 +355,7 @@ body[data-theme="dark"]::after {
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-num" id="statReports">0</div>
-          <div class="hero-stat-label">Reports Filed</div>
+          <div class="hero-stat-label">People Reached</div>
         </div>
       </div>
     </div>
@@ -381,7 +381,7 @@ body[data-theme="dark"]::after {
 
 <div class="tabs-bar">
   <div class="tabs-inner">
-    <a href="#hotspots" class="tab active">Pollution Hotspots</a>
+    <a href="#hotspots" class="tab active">Outreach Map</a>
     <a href="#report" class="tab">Submit Feedback</a>
     <a href="#composting" class="tab">Composting Guide</a>
   </div>
@@ -391,8 +391,8 @@ body[data-theme="dark"]::after {
 
   <!-- Hotspots Section -->
   <section id="hotspots" class="section">
-    <div class="section-heading reveal">Critical Pollution Hotspots</div>
-    <p class="section-sub reveal">Identified through community field surveys in Goregaon and surrounding areas.</p>
+    <div class="section-heading reveal">Community Outreach Tracking</div>
+    <p class="section-sub reveal">Live tracking of people reached through our community engagement campaign.</p>
 
     <!-- Interactive Map -->
     <div class="map-container reveal" id="hotspotMap"></div>
@@ -428,6 +428,7 @@ body[data-theme="dark"]::after {
           <option value="">Select your area...</option>
           <option>Goregaon</option>
           <option>Malad</option>
+          <option>Dindoshi</option>
           <option>Borivali</option>
           <option>Kandivali</option>
           <option>Jogeshwari</option>
@@ -436,7 +437,7 @@ body[data-theme="dark"]::after {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Feedback / Description <span>*</span></label>
+        <label class="form-label">Feedback <span>*</span></label>
         <textarea class="form-textarea" id="feedbackText" placeholder="Share your feedback, report an issue, or let us know how you'd like to volunteer..."></textarea>
       </div>
 
@@ -555,8 +556,19 @@ function toggleDarkMode(){
 /* ===== Firebase (initialized in firebase-config.js) ===== */
 
 /* ===== Interactive Map ===== */
+const locationCoords = {
+  'Goregaon': [19.1663, 72.8526],
+  'Malad': [19.1860, 72.8485],
+  'Dindoshi': [19.1760, 72.8647],
+  'Borivali': [19.2290, 72.8573],
+  'Kandivali': [19.2045, 72.8361],
+  'Jogeshwari': [19.1384, 72.8465],
+  'Other parts of Mumbai': [19.0760, 72.8777]
+};
+window.mapMarkers = [];
+
 function initMap(){
-  const map=L.map('hotspotMap',{scrollWheelZoom:false}).setView([19.1650,72.8500],13);
+  const map=L.map('hotspotMap',{scrollWheelZoom:false}).setView([19.1650,72.8500],12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap contributors',
     maxZoom:18
@@ -655,6 +667,9 @@ async function submitFeedback(){
 
     uploadedFiles=[];
     renderPreviews();
+    
+    // Update map and dashboard numbers dynamically
+    loadHeroStats();
 
     setTimeout(()=>{
       document.getElementById('successBanner').style.display='none';
@@ -750,6 +765,36 @@ async function loadHeroStats(){
   try{
     const reportSnap=await db.collection('reports').get();
     animateCounter(document.getElementById('statReports'),reportSnap.size,800);
+
+    const counts = {};
+    reportSnap.forEach(doc => {
+      const data = doc.data();
+      if(data.location) {
+        counts[data.location] = (counts[data.location] || 0) + 1;
+      }
+    });
+
+    if(window.mapMarkers) {
+      window.mapMarkers.forEach(m => m.remove());
+    }
+    window.mapMarkers = [];
+
+    if(window._hotspotMap) {
+      for(const loc in counts) {
+        if(locationCoords[loc]) {
+          const count = counts[loc];
+          const icon = L.divIcon({
+            className: 'custom-map-marker',
+            html: `<div style="background:var(--green);color:white;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.1rem;box-shadow:0 0 10px rgba(0,0,0,0.3); border:2px solid white;">${count}</div>`,
+            iconSize: [35, 35],
+            iconAnchor: [17, 17]
+          });
+          const marker = L.marker(locationCoords[loc], {icon}).addTo(window._hotspotMap);
+          marker.bindTooltip(`<b>${loc}</b>: ${count} people reached`, {direction: 'top', offset: [0, -15]});
+          window.mapMarkers.push(marker);
+        }
+      }
+    }
   }catch(e){
     console.warn('Stats load failed:',e);
   }
