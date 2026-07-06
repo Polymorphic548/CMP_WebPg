@@ -9,13 +9,13 @@ It features a sleek, glassmorphic user interface, seamless dark-mode integration
 - **Public Website (`index.html`)**: A stunning, responsive single-page application with smooth scroll-spying where users can report waste hotspots, track live weather conditions, and register for upcoming cleanup campaigns.
 - **Admin Dashboard (`admin.html`)**: A secure, premium dashboard with a sleek floating "control ribbon". Admins can view incoming reports and seamlessly manage registered volunteers.
 - **Dark Mode Sync**: Both the main page and the admin panel feature a gorgeous dark mode with glowing animated orbs. User theme preferences are automatically synced across pages via browser LocalStorage.
-- **Serverless Backend**: Powered entirely by Firebase (Realtime Database & Storage), eliminating the need for complex server infrastructure.
+- **Serverless Backend**: Powered entirely by Firebase (Firestore & Storage), eliminating the need for complex server infrastructure.
 - **Real-Time Data Generation**: Tables and stat counters on the admin dashboard are generated automatically as users interact with the public site.
 
 ## 🛠️ Technologies Used
 
 - **Frontend**: HTML5, Vanilla CSS3 (Custom Glassmorphism & Modern UI Design), Vanilla JavaScript
-- **Backend Database**: Firebase Realtime Database
+- **Backend Database**: Firebase Firestore
 - **Media Storage**: Firebase Cloud Storage (for user-uploaded report images)
 - **Hosting**: Designed to be hosted seamlessly on GitHub Pages
 
@@ -26,7 +26,7 @@ It features a sleek, glassmorphic user interface, seamless dark-mode integration
 
 2. **Firebase Configuration**
    - Create a free project on [Firebase Console](https://console.firebase.google.com/).
-   - Enable **Realtime Database** and **Cloud Storage**, temporarily setting their rules to allow public reads/writes for testing.
+   - Enable **Firestore Database** and **Cloud Storage**, temporarily setting their rules to allow public reads/writes for testing.
    - Go to Project Settings, add a new Web App, and copy your Firebase configuration object.
    - Paste those configuration details into the `firebase-config.js` file located in the project folder.
 

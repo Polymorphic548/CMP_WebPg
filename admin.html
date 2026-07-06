@@ -127,9 +127,6 @@ body::after {
 .report-badge.severity-low{background:var(--green-light);color:var(--green);}
 .report-badge.severity-med{background:var(--amber-light);color:var(--amber);}
 .report-badge.severity-high{background:var(--red-light);color:var(--red);}
-.report-badge.status-pending{background:var(--amber-light);color:var(--amber);}
-.report-badge.status-reviewed{background:var(--blue-light);color:var(--blue);}
-.report-badge.status-resolved{background:var(--green-light);color:var(--green);}
 .report-desc{font-size:0.95rem;color:var(--muted);line-height:1.6;margin-bottom:16px;}
 .report-photos{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
 .report-photos img{width:110px;height:110px;object-fit:cover;border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:transform 0.15s;}
@@ -153,11 +150,12 @@ body::after {
 .vol-table{width:100%;border-collapse:collapse;table-layout:fixed;flex:0 0 auto;}
 .vol-table.empty-table{height:100%;flex:1;}
 .vol-table th{background:rgba(0,0,0,0.03);font-size:0.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:16px 20px;text-align:left;border-bottom:1px solid var(--border);}
-.vol-table th:nth-child(1){width:15%;}
-.vol-table th:nth-child(2){width:23%;}
-.vol-table th:nth-child(3){width:17%;}
-.vol-table th:nth-child(4){width:30%;}
-.vol-table th:nth-child(5){width:15%;}
+.vol-table th:nth-child(1){width:10%;}
+.vol-table th:nth-child(2){width:13%;}
+.vol-table th:nth-child(3){width:12%;}
+.vol-table th:nth-child(4){width:15%;}
+.vol-table th:nth-child(5){width:35%; text-align:center;}
+.vol-table th:nth-child(6){width:15%;}
 [data-theme="dark"] .vol-table th{background:rgba(255,255,255,0.03);}
 .vol-table td{padding:16px 20px;font-size:0.95rem;border-bottom:1px solid var(--border);transition:background 0.15s;}
 .vol-table tr:last-child td{border-bottom:none;}
@@ -221,15 +219,16 @@ body::after {
     <table class="vol-table" id="spreadsheetTable">
       <thead>
         <tr>
+          <th>Date</th>
           <th>Name</th>
-          <th>Contact Information</th>
+          <th>Contact</th>
           <th>Location</th>
-          <th>Description (Feedback)</th>
-          <th>Photos Submitted</th>
+          <th><div style="position:relative; left:-100px; display:inline-block;">Feedback</div></th>
+          <th>Photos</th>
         </tr>
       </thead>
       <tbody id="reportList">
-        <tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div>Loading data...</div></td></tr>
+        <tr><td colspan="6"><div class="empty-state"><div class="icon">📭</div>Loading data...</div></td></tr>
       </tbody>
     </table>
   </div>
@@ -294,7 +293,7 @@ async function loadReports(){
 
     if(snap.empty){
       table.classList.add('empty-table');
-      container.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div>No data submitted yet.</div></td></tr>';
+      container.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">📭</div>No data submitted yet.</div></td></tr>';
       return;
     }
 
@@ -303,12 +302,16 @@ async function loadReports(){
     const docsToRender = snap.docs.slice(0, 50);
     docsToRender.forEach(doc=>{
       const d=doc.data();
+      const id=doc.id;
       const photosLinks = (d.photoURLs||[]).map((url, i) => `<a href="#" onclick="openModal('${url}'); return false;" style="color:var(--blue);text-decoration:underline;margin-right:8px;white-space:nowrap;">View Image ${i+1}</a>`).join('<br>');
+      
+      const timeStr = d.timestamp ? d.timestamp.toDate().toLocaleString() : 'Just now';
       
       rows+=`
         <tr>
+          <td><div style="font-size:0.8rem;color:var(--muted);">${timeStr}</div></td>
           <td><strong>${escHtml(d.reporterName||'Anonymous')}</strong></td>
-          <td>${escHtml(d.contact||'—')}</td>
+          <td><span style="font-size:0.85rem;color:var(--muted);">${escHtml(d.contact||'—')}</span></td>
           <td>${escHtml(d.location)}</td>
           <td>${escHtml(d.feedback||d.description||'—')}</td>
           <td>${photosLinks||'—'}</td>
@@ -322,14 +325,6 @@ async function loadReports(){
   }
 }
 
-async function updateReportStatus(docId,status){
-  try{
-    await db.collection('reports').doc(docId).update({status:status});
-    loadReports();
-  }catch(e){
-    alert('Failed to update report: '+e.message);
-  }
-}
 
 /* ===== Modal Logic ===== */
 function openModal(url) {

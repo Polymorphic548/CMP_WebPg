@@ -447,7 +447,7 @@ body[data-theme="dark"]::after {
           <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
           <div class="upload-icon">📷</div>
           <div class="upload-text"><strong>Click to upload</strong> or drag &amp; drop images here</div>
-          <div class="upload-sub">JPG, PNG, WEBP — up to 10 photos, max 5 MB each</div>
+          <div class="upload-sub">JPG, PNG, WEBP — up to 2 photos, max 5 MB each</div>
         </div>
         <div class="preview-grid" id="previewGrid"></div>
       </div>
@@ -587,7 +587,7 @@ zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-
 
 let uploadedFiles=[];
 function handleFiles(files){
-  Array.from(files).slice(0,10-uploadedFiles.length).forEach(f=>{
+  Array.from(files).slice(0,2-uploadedFiles.length).forEach(f=>{
     if(!f.type.startsWith('image/'))return;
     if(f.size>5*1024*1024){showToast('File "'+f.name+'" exceeds 5 MB limit.','error');return;}
     const reader=new FileReader();
@@ -655,8 +655,7 @@ async function submitFeedback(){
       reporterName:reporterName,
       contact:contact,
       photoURLs:photoURLs,
-      timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-      status:'pending'
+      timestamp:firebase.firestore.FieldValue.serverTimestamp()
     });
 
     document.getElementById('successBanner').style.display='block';
