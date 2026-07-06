@@ -200,7 +200,7 @@ body[data-theme="dark"]::after {
 .hs-badge.med{background:var(--amber-light);color:var(--amber);}
 
 /* Map */
-.map-container{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:28px;height:340px;}
+.map-container{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:28px;height:450px;}
 .map-container .leaflet-control-attribution{font-size:0.65rem;}
 
 /* Campaigns */
@@ -313,7 +313,7 @@ body[data-theme="dark"]::after {
   .nav a{display:none;}
   .hero-stats{gap:14px; flex-wrap: wrap; justify-content: center;}
   .hero-stat-num{font-size:1.5rem;}
-  .map-container{height:280px;}
+  .map-container{height:350px;}
   .camp-img{height:180px;}
   .main{padding: 20px 16px;}
   .report-form, .info-card, .camp-body {padding: 20px;}
@@ -339,8 +339,7 @@ body[data-theme="dark"]::after {
   <div class="header-inner">
     <div class="logo">Eco<span>Green</span> Mumbai</div>
     <nav class="nav">
-      <a href="#hotspots" class="active">Weather</a>
-      <a href="#campaigns">Campaigns</a>
+      <a href="#hotspots" class="active">Hotspots</a>
       <a href="#report">Report Site</a>
       <a href="#composting">Composting</a>
       <div class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle dark mode"></div>
@@ -358,32 +357,31 @@ body[data-theme="dark"]::after {
           <div class="hero-stat-num" id="statReports">0</div>
           <div class="hero-stat-label">Reports Filed</div>
         </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="statVolunteers">0</div>
-          <div class="hero-stat-label">Volunteers</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="statCampaigns">4</div>
-          <div class="hero-stat-label">Campaigns</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="statLocalities">8</div>
-          <div class="hero-stat-label">Localities</div>
-        </div>
       </div>
     </div>
-    <div class="aqi-hero">
-      <div class="aqi-num" id="heroAqi">75</div>
-      <div class="aqi-label">AQI Index</div>
-      <div class="aqi-status" id="heroStatus">Moderate</div>
+    <div class="weather-hero" style="display:flex; flex-direction:column; gap:10px; background:rgba(255,255,255,0.1); padding:20px; border-radius:12px; backdrop-filter:blur(10px); min-width: 250px;">
+      <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">Mumbai Live</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size: 2.5rem; font-weight: 800; line-height: 1;" id="mumbaiTemp">--°</div>
+          <div style="font-size: 0.9rem; opacity: 0.8;" id="mumbaiWeatherDesc">Fetching weather...</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 1.8rem; font-weight: 700; line-height: 1;" id="mumbaiAqi">--</div>
+          <div style="font-size: 0.8rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; display:inline-block; margin-top:4px;" id="mumbaiAqiStatus">AQI</div>
+        </div>
+      </div>
+      <div style="display:flex; gap: 10px; font-size: 0.85rem; opacity: 0.9; margin-top: 5px;">
+        <span id="mumbaiHumidity">💧 --%</span>
+        <span id="mumbaiWind">💨 -- km/h</span>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="tabs-bar">
   <div class="tabs-inner">
-    <a href="#hotspots" class="tab active">Hotspots & Weather</a>
-    <a href="#campaigns" class="tab">Campaigns</a>
+    <a href="#hotspots" class="tab active">Pollution Hotspots</a>
     <a href="#report" class="tab">Report Site</a>
     <a href="#composting" class="tab">Composting Guide</a>
   </div>
@@ -391,153 +389,17 @@ body[data-theme="dark"]::after {
 
 <div class="main">
 
-  <!-- Hotspots & Weather Section -->
+  <!-- Hotspots Section -->
   <section id="hotspots" class="section">
-    <p class="weather-intro">Live temperature data fetched from Open-Meteo for key Goregaon localities. Updates every time you visit.</p>
-    <div class="weather-note">📡 Weather data powered by <strong>Open-Meteo</strong> (open-source, no API key required). Temperatures are current readings for each area's coordinates.</div>
-    <button class="refresh-btn" id="refreshBtn" onclick="loadWeather()">↻ Refresh Weather Data</button>
-    <div class="weather-grid" id="weatherGrid">
-      <!-- cards inserted by JS -->
-    </div>
-
     <div class="section-heading reveal">Critical Pollution Hotspots</div>
     <p class="section-sub reveal">Identified through community field surveys in Goregaon and surrounding areas.</p>
 
     <!-- Interactive Map -->
     <div class="map-container reveal" id="hotspotMap"></div>
 
-    <div class="hotspot-list">
-      <div class="hotspot reveal">
-        <div class="hotspot-icon high">⚠️</div>
-        <div>
-          <div class="hs-name">Aarey Colony — International Road Litter</div>
-          <div class="hs-desc">Plastic waste and food debris along the main road corridor near Aarey Milk Colony.</div>
-        </div>
-        <div class="hs-badge high">High severity</div>
-      </div>
-      <div class="hotspot reveal">
-        <div class="hotspot-icon high">⚠️</div>
-        <div>
-          <div class="hs-name">Oshiwara River Bank — Plastic Clogging</div>
-          <div class="hs-desc">Plastic waste accumulation blocking the natural river flow and causing drainage issues.</div>
-        </div>
-        <div class="hs-badge high">High severity</div>
-      </div>
-      <div class="hotspot reveal">
-        <div class="hotspot-icon med">🔶</div>
-        <div>
-          <div class="hs-name">WEH Metro Junctions — Dust &amp; Debris</div>
-          <div class="hs-desc">Construction dust and debris accumulation near Western Express Highway metro stations.</div>
-        </div>
-        <div class="hs-badge med">Medium severity</div>
-      </div>
-      <div class="hotspot reveal">
-        <div class="hotspot-icon med">🔶</div>
-        <div>
-          <div class="hs-name">Link Road Industrial Pockets</div>
-          <div class="hs-desc">Industrial waste and exhaust near Goregaon East link road commercial zones.</div>
-        </div>
-        <div class="hs-badge med">Medium severity</div>
-      </div>
-    </div>
+
   </section>
 
-  <!-- CAMPAIGNS TAB -->
-  <section id="campaigns" class="section">
-    <div class="section-heading">Active &amp; Upcoming Campaigns</div>
-    <p class="section-sub">Join community-organized drives across Goregaon and nearby areas. Register or call the coordinator directly.</p>
-    <div class="campaigns-grid">
-
-      <div class="camp-card reveal">
-        <img class="camp-img" src="images/aarey-forest.png" alt="Aarey Forest">
-        <div class="camp-body">
-        <div class="camp-header">
-          <div class="camp-title">Aarey Forest Clean-Up Drive</div>
-          <div class="camp-badge active">Active</div>
-        </div>
-        <div class="camp-org">Organized by: <strong>Earth5R</strong></div>
-        <div class="camp-meta">
-          <div class="camp-row"><span class="camp-row-icon">📅</span><div><span>Date: </span><strong>This Saturday, June 21, 2026</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📍</span><div><span>Address: </span><strong>Aarey Milk Colony Gate No. 2, Goregaon East, Mumbai 400065</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">⏰</span><div><span>Time: </span><strong>7:00 AM – 10:00 AM</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📞</span><div><span>Coordinator: </span><strong>+91 98765 43210</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">👥</span><div><span>Volunteers registered: </span><strong id="vol-aarey-cleanup">0</strong></div></div>
-        </div>
-        <div class="camp-actions">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSfRad61woTZu24SVTiP5c19MCxkh9Nwj5m_m9GhPQUNgiiftA/viewform?usp=header" target="_blank" class="btn btn-primary">Register Now</a>
-          <a href="tel:+919876543210" class="btn btn-outline">📞 Call</a>
-        </div>
-        </div>
-      </div>
-
-      <div class="camp-card reveal">
-        <img class="camp-img" src="images/versova-beach.png" alt="Versova Beach">
-        <div class="camp-body">
-        <div class="camp-header">
-          <div class="camp-title">Jallosh Coastal Clean-Up Drive</div>
-          <div class="camp-badge upcoming">Upcoming</div>
-        </div>
-        <div class="camp-org">Organized by: <strong>Project Mumbai</strong></div>
-        <div class="camp-meta">
-          <div class="camp-row"><span class="camp-row-icon">📅</span><div><span>Date: </span><strong>Saturday, June 28, 2026</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📍</span><div><span>Address: </span><strong>Versova Beach Parking Lot, Andheri West, Mumbai 400061</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">⏰</span><div><span>Time: </span><strong>6:30 AM – 9:30 AM</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📞</span><div><span>Coordinator: </span><strong>+91 98765 01234</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">👥</span><div><span>Volunteers registered: </span><strong id="vol-jallosh-coastal">0</strong></div></div>
-        </div>
-        <div class="camp-actions">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLScT5Bg3nO4hz_8Oov3rBMi45OaL6nkvok1NahXNwFlqKpDMNQ/viewform?usp=publish-editor" target="_blank" class="btn btn-primary">Register Now</a>
-          <a href="tel:+919876501234" class="btn btn-outline">📞 Call</a>
-        </div>
-        </div>
-      </div>
-
-      <div class="camp-card reveal">
-        <img class="camp-img" src="images/oshiwara-river.png" alt="Oshiwara River">
-        <div class="camp-body">
-        <div class="camp-header">
-          <div class="camp-title">Oshiwara River Bank Restoration</div>
-          <div class="camp-badge upcoming">Upcoming</div>
-        </div>
-        <div class="camp-org">Organized by: <strong>Goregaon Green Warriors</strong></div>
-        <div class="camp-meta">
-          <div class="camp-row"><span class="camp-row-icon">📅</span><div><span>Date: </span><strong>Sunday, July 6, 2026</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📍</span><div><span>Address: </span><strong>Oshiwara River, near Film City Road, Goregaon West, Mumbai 400104</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">⏰</span><div><span>Time: </span><strong>8:00 AM – 12:00 PM</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📞</span><div><span>Coordinator: </span><strong>+91 85910 73889</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">👥</span><div><span>Volunteers registered: </span><strong id="vol-oshiwara-river">0</strong></div></div>
-        </div>
-        <div class="camp-actions">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSfRad61woTZu24SVTiP5c19MCxkh9Nwj5m_m9GhPQUNgiiftA/viewform?usp=header" target="_blank" class="btn btn-primary">Register via gForm</a>
-          <a href="tel:+918591073889" class="btn btn-outline">📞 Call</a>
-        </div>
-        </div>
-      </div>
-
-      <div class="camp-card reveal">
-        <img class="camp-img" src="images/goregaon-street.png" alt="Goregaon Street">
-        <div class="camp-body">
-        <div class="camp-header">
-          <div class="camp-title">Goregaon West Plastic-Free Walk</div>
-          <div class="camp-badge active">Active</div>
-        </div>
-        <div class="camp-org">Organized by: <strong>Mumbai CleanCity NGO</strong></div>
-        <div class="camp-meta">
-          <div class="camp-row"><span class="camp-row-icon">📅</span><div><span>Date: </span><strong>Every Sunday, ongoing</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📍</span><div><span>Address: </span><strong>Oberoi Mall Gate, S.V. Road, Goregaon West, Mumbai 400104</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">⏰</span><div><span>Time: </span><strong>7:30 AM – 9:00 AM</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">📞</span><div><span>Coordinator: </span><strong>+91 98200 12345</strong></div></div>
-          <div class="camp-row"><span class="camp-row-icon">👥</span><div><span>Open to all — walk-ins welcome</span></div></div>
-        </div>
-        <div class="camp-actions">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLScT5Bg3nO4hz_8Oov3rBMi45OaL6nkvok1NahXNwFlqKpDMNQ/viewform?usp=publish-editor" target="_blank" class="btn btn-primary">Register via gForm</a>
-          <a href="https://maps.google.com/?q=Oberoi+Mall+Goregaon+West+Mumbai" target="_blank" class="btn btn-outline">📍 View Map</a>
-        </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
 
   <!-- REPORT TAB -->
   <section id="report" class="section">
@@ -630,50 +492,60 @@ body[data-theme="dark"]::after {
     </div>
 
     <div class="info-card reveal">
-      <h3>Quick Home Composting Guide (3 steps)</h3>
+      <h3>The Mumbai Apartment Composting Guide</h3>
+      <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;">Living in a Mumbai high-rise doesn't mean you can't compost! Here is a foolproof, odor-free method designed specifically for small balconies and compact spaces, aligned with BMC's on-site waste processing mandate.</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+        <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.2); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #4caf50; margin: 0 0 10px 0; font-size: 1rem;">✅ The "Greens" (Wet)</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--muted); line-height:1.5;">
+            <li>Vegetable peels & fruit skins</li>
+            <li>Tea leaves & coffee grounds</li>
+            <li>Crushed eggshells</li>
+            <li>Leftover cooked food (rinse off oil)</li>
+          </ul>
+        </div>
+        <div style="background: rgba(201, 116, 0, 0.1); border: 1px solid rgba(201, 116, 0, 0.2); padding: 15px; border-radius: 8px;">
+          <h4 style="color: #c97400; margin: 0 0 10px 0; font-size: 1rem;">🍂 The "Browns" (Dry)</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--muted); line-height:1.5;">
+            <li>Dry leaves (from local parks)</li>
+            <li>Cocopeat (local nurseries)</li>
+            <li>Torn brown cardboard</li>
+            <li>Shredded non-glossy newspaper</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="steps-list">
         <div class="step">
           <div class="step-num">1</div>
-          <div class="step-text"><strong>Separate your waste.</strong> Collect raw and cooked kitchen scraps — vegetable peels, fruit waste, coffee grounds, eggshells. Keep it separate from plastics, glass, and dry waste.</div>
+          <div class="step-text"><strong>Choose Your Bin:</strong> Get a breathable terracotta Khamba (layered pots) or a repurposed plastic bucket. <strong>Crucial:</strong> Drill multiple holes around the sides and bottom. Mumbai's humidity requires maximum airflow to prevent odors.</div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
-          <div class="step-text"><strong>Layer into a ventilated bin.</strong> Add your wet waste into a pot with drainage holes. Layer each addition with dry brown material — dried leaves, cocopeat, or cardboard torn into small bits. The ratio is roughly 1:1 wet to dry.</div>
+          <div class="step-text"><strong>Create the Base Layer:</strong> Start with a 2-inch layer of dry "Browns" at the bottom of your bin. This absorbs excess moisture from the wet waste—a common issue during Mumbai's heavy monsoons.</div>
         </div>
         <div class="step">
           <div class="step-num">3</div>
-          <div class="step-text"><strong>Stir weekly and wait.</strong> Turn the pile lightly once a week to aerate it. In 4–6 weeks, you'll have dark, crumbly, earth-smelling compost ready to use.</div>
+          <div class="step-text"><strong>The 1:2 Ratio Rule:</strong> For every bowl of wet kitchen "Greens" you add, top it off with two bowls of dry "Browns". Mix them well or layer them. The browns act as a biofilter, completely masking any smells.</div>
         </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Aerate & Maintain:</strong> Once a week, use a stick or trowel to turn the mixture, giving it oxygen. If it gets too soggy or smells sour, add more cocopeat or dry leaves. If it's too dry and dusty, sprinkle a few drops of buttermilk or water.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text"><strong>Harvest Your 'Black Gold':</strong> In 45 to 60 days, your waste will transform into a dark, crumbly, earthy-smelling compost. Use it to supercharge your balcony plants or donate it to your housing society's garden!</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px; padding: 12px 16px; background: rgba(255, 0, 0, 0.05); border-left: 4px solid #f44336; border-radius: 4px;">
+        <strong style="color: #f44336; font-size: 0.9rem;">🚫 What NOT to compost:</strong> <span style="font-size: 0.9rem; color: var(--muted);">Meat, bones, dairy products, glossy magazines, heavily oily/spicy curries, or plastic of any kind. These will attract pests and ruin the pile.</span>
       </div>
     </div>
 
-    <div class="info-card reveal">
-      <h3>Request a Free Composting Workshop</h3>
-      <p style="font-size:.9rem;color:var(--muted);margin-bottom:16px;">Our Green Warriors team visits housing societies across Goregaon to run hands-on composting sessions — free of charge.</p>
-      <a href="mailto:kasturihatode@gmail.com?subject=Composting%20Workshop%20Request" class="btn btn-primary">Request a Workshop via Email</a>
-      <a href="tel:+918591073889" class="btn btn-outline" style="margin-left:8px;">📞 Call Us</a>
-    </div>
   </section>
 
-</div>
-
-<!-- Registration Modal -->
-<div class="modal-overlay" id="registerModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeRegisterModal()">✕</button>
-    <h3 class="modal-title">Volunteer Registration</h3>
-    <p class="modal-subtitle" id="modalCampaignName"></p>
-    <div class="form-group">
-      <label class="form-label">Your Name <span>*</span></label>
-      <input class="form-input" id="regName" type="text" placeholder="Enter your full name">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Phone or Email <span>*</span></label>
-      <input class="form-input" id="regContact" type="text" placeholder="+91 98765 43210 or email">
-    </div>
-    <input type="hidden" id="regCampaignId">
-    <button class="submit-btn" id="regSubmitBtn" onclick="submitRegistration()">Register as Volunteer →</button>
-  </div>
 </div>
 
 <!-- Toast Notification -->
@@ -702,91 +574,6 @@ function toggleDarkMode(){
 
 /* ===== Firebase (initialized in firebase-config.js) ===== */
 
-/* ===== Weather Data ===== */
-const LOCALITIES=[
-  {name:"Goregaon East",lat:19.1663,lon:72.8526},
-  {name:"Goregaon West",lat:19.1604,lon:72.8445},
-  {name:"Aarey Colony",lat:19.1763,lon:72.8714},
-  {name:"Oshiwara",lat:19.1530,lon:72.8330},
-  {name:"Film City Road",lat:19.1710,lon:72.8600},
-  {name:"Malad West",lat:19.1862,lon:72.8484},
-  {name:"Kandivali East",lat:19.2041,lon:72.8615},
-  {name:"Andheri West",lat:19.1275,lon:72.8347}
-];
-
-const wmoDescriptions={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",48:"Icy fog",51:"Light drizzle",61:"Slight rain",63:"Moderate rain",80:"Rain showers",95:"Thunderstorm"};
-
-function wmoDesc(code){
-  return wmoDescriptions[code]||"Cloudy";
-}
-
-async function fetchWeatherForLocations(localities) {
-  const lats = localities.map(l => l.lat).join(',');
-  const lons = localities.map(l => l.lon).join(',');
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,apparent_temperature,precipitation,weather_code,relative_humidity_2m,wind_speed_10m&wind_speed_unit=kmh&timezone=Asia/Kolkata`;
-  const r=await fetch(url);
-  const d=await r.json();
-  return Array.isArray(d) ? d.map(loc => loc.current) : [d.current];
-}
-
-function tempClass(t){
-  if(t>=34)return'hot';
-  if(t<=25)return'cool';
-  return'';
-}
-
-function buildCard(loc,data){
-  const t=Math.round(data.temperature_2m);
-  const feels=Math.round(data.apparent_temperature);
-  const rain=data.precipitation;
-  const humidity=Math.round(data.relative_humidity_2m);
-  const wind=Math.round(data.wind_speed_10m);
-  const desc=wmoDesc(data.weather_code);
-  const cls=tempClass(t);
-  return`<div class="weather-card ${cls}">
-    <div class="wc-name">${loc.name}</div>
-    <div class="wc-temp">${t}<span class="wc-unit">°C</span></div>
-    <div style="font-size:.82rem;color:var(--muted);margin-top:4px;">${desc} · Feels ${feels}°C</div>
-    <div class="wc-meta">
-      <div class="wc-pill ${rain>0?'rain':''}">💧 ${humidity}% humidity</div>
-      <div class="wc-pill">💨 ${wind} km/h</div>
-      ${rain>0?`<div class="wc-pill rain">🌧 ${rain}mm rain</div>`:''}
-    </div>
-  </div>`;
-}
-
-function buildSkeleton(name){
-  return`<div class="weather-card">
-    <div class="wc-name">${name}</div>
-    <div class="wc-temp loading-pulse" style="background:var(--border);border-radius:4px;height:40px;width:90px;"></div>
-    <div style="margin-top:8px;height:14px;background:var(--bg);border-radius:4px;width:70%;animation:pulse 1.4s infinite;"></div>
-  </div>`;
-}
-
-async function loadWeather(){
-  const grid=document.getElementById('weatherGrid');
-  const btn=document.getElementById('refreshBtn');
-  btn.disabled=true;btn.textContent='Loading...';
-  grid.innerHTML=LOCALITIES.map(l=>buildSkeleton(l.name)).join('');
-  try {
-    const results = await fetchWeatherForLocations(LOCALITIES);
-    grid.innerHTML='';
-    results.forEach((currentData, i)=>{
-      if(currentData){
-        grid.innerHTML+=buildCard(LOCALITIES[i], currentData);
-      } else {
-        grid.innerHTML+=`<div class="weather-card"><div class="wc-name">${LOCALITIES[i].name}</div><div style="color:var(--muted);font-size:.85rem;margin-top:8px;">Data unavailable</div></div>`;
-      }
-    });
-  } catch(e) {
-    grid.innerHTML='';
-    LOCALITIES.forEach(l => {
-      grid.innerHTML+=`<div class="weather-card"><div class="wc-name">${l.name}</div><div style="color:var(--muted);font-size:.85rem;margin-top:8px;">Data unavailable</div></div>`;
-    });
-  }
-  btn.disabled=false;btn.textContent='↻ Refresh Weather Data';
-}
-
 /* ===== Interactive Map ===== */
 function initMap(){
   const map=L.map('hotspotMap',{scrollWheelZoom:false}).setView([19.1650,72.8500],13);
@@ -794,30 +581,6 @@ function initMap(){
     attribution:'© OpenStreetMap contributors',
     maxZoom:18
   }).addTo(map);
-
-  const hotspots=[
-    {lat:19.1763,lon:72.8714,name:'Aarey Colony',desc:'International Road Litter — Plastic waste & food debris',severity:'high'},
-    {lat:19.1530,lon:72.8330,name:'Oshiwara River Bank',desc:'Plastic clogging — blocking natural river flow',severity:'high'},
-    {lat:19.1660,lon:72.8580,name:'WEH Metro Junctions',desc:'Construction dust & debris near metro stations',severity:'med'},
-    {lat:19.1640,lon:72.8510,name:'Link Road Industrial',desc:'Industrial waste & exhaust near commercial zones',severity:'med'}
-  ];
-
-  hotspots.forEach(h=>{
-    const color=h.severity==='high'?'#b91c1c':'#c97400';
-    const icon=L.divIcon({
-      className:'',
-      html:`<div style="width:14px;height:14px;background:${color};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
-      iconSize:[14,14],iconAnchor:[7,7]
-    });
-    L.marker([h.lat,h.lon],{icon:icon}).addTo(map)
-      .bindPopup(`<strong>${h.name}</strong><br><span style="font-size:0.85rem;color:#666;">${h.desc}</span>`);
-  });
-
-  // Also mark localities
-  LOCALITIES.forEach(l=>{
-    L.circleMarker([l.lat,l.lon],{radius:5,fillColor:'#1a6b3c',color:'#fff',weight:2,fillOpacity:0.8}).addTo(map)
-      .bindPopup(`<strong>${l.name}</strong><br><span style="font-size:0.85rem;color:#666;">Weather monitoring point</span>`);
-  });
 
   window._hotspotMap=map;
   // Fix map size on first view
@@ -960,129 +723,44 @@ function setupScrollNav(){
   sections.forEach(sec=>observer.observe(sec));
 }
 
-/* ===== Live AQI ===== */
-async function fetchAQI(){
+
+
+/* ===== Mumbai Live Data ===== */
+const wmoDescriptions={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",48:"Icy fog",51:"Light drizzle",61:"Slight rain",63:"Moderate rain",80:"Rain showers",95:"Thunderstorm"};
+
+async function fetchMumbaiData(){
   try{
-    const url='https://air-quality-api.open-meteo.com/v1/air-quality?latitude=19.1663&longitude=72.8526&current=us_aqi,pm2_5,pm10';
-    const r=await fetch(url);
-    const d=await r.json();
-    const aqi=Math.round(d.current.us_aqi);
-    document.getElementById('heroAqi').textContent=aqi;
-    let status='Good',bg='#4caf50',fg='#fff';
+    // Weather
+    const weatherUrl='https://api.open-meteo.com/v1/forecast?latitude=19.0760&longitude=72.8777&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=Asia/Kolkata';
+    const wr = await fetch(weatherUrl);
+    const wd = await wr.json();
+    
+    document.getElementById('mumbaiTemp').textContent = Math.round(wd.current.temperature_2m) + '°C';
+    document.getElementById('mumbaiWeatherDesc').textContent = wmoDescriptions[wd.current.weather_code] || 'Cloudy';
+    document.getElementById('mumbaiHumidity').textContent = '💧 ' + Math.round(wd.current.relative_humidity_2m) + '%';
+    document.getElementById('mumbaiWind').textContent = '💨 ' + Math.round(wd.current.wind_speed_10m) + ' km/h';
+
+    // AQI
+    const aqiUrl='https://air-quality-api.open-meteo.com/v1/air-quality?latitude=19.0760&longitude=72.8777&current=us_aqi';
+    const ar = await fetch(aqiUrl);
+    const ad = await ar.json();
+    
+    const aqi = Math.round(ad.current.us_aqi);
+    document.getElementById('mumbaiAqi').textContent = aqi;
+    
+    let status='Good', bg='#4caf50', fg='#fff';
     if(aqi>300){status='Hazardous';bg='#7e0023';}
     else if(aqi>200){status='Very Unhealthy';bg='#8f3f97';}
     else if(aqi>150){status='Unhealthy';bg='#ff0000';}
     else if(aqi>100){status='Unhealthy (Sensitive)';bg='#ff9800';fg='#3d2f00';}
     else if(aqi>50){status='Moderate';bg='#ffdb4d';fg='#3d2f00';}
-    const el=document.getElementById('heroStatus');
-    el.textContent=status;
-    el.style.background=bg;
-    el.style.color=fg;
+    
+    const el = document.getElementById('mumbaiAqiStatus');
+    el.textContent = status;
+    el.style.background = bg;
+    el.style.color = fg;
   }catch(e){
-    console.warn('AQI fetch failed, keeping default value',e);
-  }
-}
-
-/* ===== Campaign Registration ===== */
-const CAMPAIGNS=[
-  {id:'aarey-cleanup',title:'Aarey Forest Clean-Up Drive',needed:25},
-  {id:'jallosh-coastal',title:'Jallosh Coastal Clean-Up Drive',needed:50},
-  {id:'oshiwara-river',title:'Oshiwara River Bank Restoration',needed:30},
-  {id:'plastic-free-walk',title:'Goregaon West Plastic-Free Walk',needed:0}
-];
-
-function setupCampaignButtons(){
-  document.querySelectorAll('.camp-card').forEach((card,i)=>{
-    if(i>=CAMPAIGNS.length)return;
-    const campaign=CAMPAIGNS[i];
-    card.dataset.campaignId=campaign.id;
-    const rows=card.querySelectorAll('.camp-row');
-    rows.forEach(row=>{
-      if(row.textContent.includes('👥')){
-        const strong=row.querySelector('strong');
-        if(strong)strong.id='vol-'+campaign.id;
-      }
-    });
-    const registerBtn=card.querySelector('.btn-primary');
-    if(registerBtn && campaign.needed>0){
-      registerBtn.href='#';
-      registerBtn.onclick=function(e){e.preventDefault();openRegisterModal(campaign.id,campaign.title);};
-      registerBtn.textContent='Register Now';
-    }
-  });
-}
-
-function openRegisterModal(campaignId,campaignTitle){
-  document.getElementById('regCampaignId').value=campaignId;
-  document.getElementById('modalCampaignName').textContent=campaignTitle;
-  document.getElementById('regName').value='';
-  document.getElementById('regContact').value='';
-  document.getElementById('registerModal').classList.add('open');
-  document.getElementById('regName').focus();
-}
-
-function closeRegisterModal(){
-  document.getElementById('registerModal').classList.remove('open');
-}
-
-async function submitRegistration(){
-  const name=document.getElementById('regName').value.trim();
-  const contact=document.getElementById('regContact').value.trim();
-  const campaignId=document.getElementById('regCampaignId').value;
-  const campaignTitle=document.getElementById('modalCampaignName').textContent;
-  if(!name){showToast('Please enter your name.','error');return;}
-  if(!contact){showToast('Please enter your phone or email.','error');return;}
-  if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contact) && !/^\+?\d{10,14}$/.test(contact)) {
-    showToast('Please enter a valid email or phone number.','error');
-    return;
-  }
-
-  const btn=document.getElementById('regSubmitBtn');
-  btn.disabled=true;
-  btn.textContent='Registering...';
-
-  try{
-    const existing=await db.collection('volunteers')
-      .where('campaignId','==',campaignId)
-      .where('contact','==',contact)
-      .get();
-    if(!existing.empty){
-      showToast('You are already registered for this campaign!','error');
-      btn.disabled=false;
-      btn.textContent='Register as Volunteer →';
-      return;
-    }
-    await db.collection('volunteers').add({
-      name:name,
-      contact:contact,
-      campaignId:campaignId,
-      campaignName:campaignTitle,
-      registeredAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    closeRegisterModal();
-    showToast('You are registered! See you at the campaign. 💚','success');
-    loadVolunteerCounts();
-    loadHeroStats();
-  }catch(err){
-    console.error('Registration error:',err);
-    showToast('Registration failed. Please try again.','error');
-  }finally{
-    btn.disabled=false;
-    btn.textContent='Register as Volunteer →';
-  }
-}
-
-async function loadVolunteerCounts(){
-  try{
-    for(const camp of CAMPAIGNS){
-      if(camp.needed===0)continue;
-      const snap=await db.collection('volunteers').where('campaignId','==',camp.id).get();
-      const count=snap.size;
-      const el=document.getElementById('vol-'+camp.id);
-      if(el)el.textContent=count;
-    }
-  }catch(e){
-    console.warn('Could not load volunteer counts:',e);
+    console.warn('Mumbai data fetch failed',e);
   }
 }
 
@@ -1101,12 +779,8 @@ function animateCounter(el,target,duration){
 
 async function loadHeroStats(){
   try{
-    const [reportSnap,volSnap]=await Promise.all([
-      db.collection('reports').get(),
-      db.collection('volunteers').get()
-    ]);
+    const reportSnap=await db.collection('reports').get();
     animateCounter(document.getElementById('statReports'),reportSnap.size,800);
-    animateCounter(document.getElementById('statVolunteers'),volSnap.size,800);
   }catch(e){
     console.warn('Stats load failed:',e);
   }
@@ -1144,21 +818,11 @@ function showToast(msg,type){
 }
 
 /* ===== Initialization ===== */
-loadWeather();
-fetchAQI();
+fetchMumbaiData();
 initMap();
-setupCampaignButtons();
-loadVolunteerCounts();
 loadHeroStats();
 observeReveals();
 setupScrollNav();
-
-document.getElementById('registerModal').addEventListener('click',function(e){
-  if(e.target===this)closeRegisterModal();
-});
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape')closeRegisterModal();
-});
 </script>
 </body>
 </html>
