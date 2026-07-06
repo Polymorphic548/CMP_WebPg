@@ -340,7 +340,7 @@ body[data-theme="dark"]::after {
     <div class="logo">Eco<span>Green</span> Mumbai</div>
     <nav class="nav">
       <a href="#hotspots" class="active">Hotspots</a>
-      <a href="#report">Report Site</a>
+      <a href="#report">Submit Feedback</a>
       <a href="#composting">Composting</a>
       <div class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle dark mode"></div>
     </nav>
@@ -382,7 +382,7 @@ body[data-theme="dark"]::after {
 <div class="tabs-bar">
   <div class="tabs-inner">
     <a href="#hotspots" class="tab active">Pollution Hotspots</a>
-    <a href="#report" class="tab">Report Site</a>
+    <a href="#report" class="tab">Submit Feedback</a>
     <a href="#composting" class="tab">Composting Guide</a>
   </div>
 </div>
@@ -403,54 +403,45 @@ body[data-theme="dark"]::after {
 
   <!-- REPORT TAB -->
   <section id="report" class="section">
-    <div class="section-heading">Report a Pollution Site</div>
-    <p class="section-sub">Found a new dump site or pollution hotspot? Document it here — our team reviews and maps every verified report.</p>
+    <div class="section-heading">Feedback & Volunteering</div>
+    <p class="section-sub">Share your thoughts, report an issue, or sign up to volunteer in your local area.</p>
 
     <div class="success-banner" id="successBanner">
-      ✅ Report submitted successfully! Our team will review and map it within 24 hours. Thank you for helping keep Goregaon clean.
+      ✅ Feedback submitted successfully! Our team will review it shortly. Thank you for helping keep Mumbai clean.
     </div>
 
     <div class="report-form reveal">
-      <div class="form-group">
-        <label class="form-label">Location / Area Name <span>*</span></label>
-        <input class="form-input" id="locName" placeholder="e.g. Behind Oberoi Mall, Goregaon West" type="text">
-      </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Nearest Landmark</label>
-          <input class="form-input" id="landmark" placeholder="e.g. Near Poisar Bus Depot" type="text">
+          <label class="form-label">Your Name <span>*</span></label>
+          <input class="form-input" id="reporterName" placeholder="Enter your name" type="text">
         </div>
         <div class="form-group">
-          <label class="form-label">Pollution Type <span>*</span></label>
-          <select class="form-select" id="pollType">
-            <option value="">Select type...</option>
-            <option>Plastic waste dumping</option>
-            <option>Open sewage / drainage</option>
-            <option>Construction debris</option>
-            <option>Industrial effluent</option>
-            <option>Air pollution source</option>
-            <option>Water body contamination</option>
-            <option>Other</option>
-          </select>
+          <label class="form-label">Contact <span>*</span></label>
+          <input class="form-input" id="reporterContact" placeholder="Phone or email" type="text">
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Severity Level <span>*</span></label>
-        <div class="severity-group" id="severityGroup">
-          <button class="severity-btn low" onclick="selectSeverity(this,'low')">🟢 Low</button>
-          <button class="severity-btn med" onclick="selectSeverity(this,'med')">🟡 Moderate</button>
-          <button class="severity-btn high" onclick="selectSeverity(this,'high')">🔴 High</button>
-        </div>
+        <label class="form-label">Location in Mumbai <span>*</span></label>
+        <select class="form-select" id="locName">
+          <option value="">Select your area...</option>
+          <option>Goregaon</option>
+          <option>Malad</option>
+          <option>Borivali</option>
+          <option>Kandivali</option>
+          <option>Jogeshwari</option>
+          <option>Other parts of Mumbai</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-textarea" id="description" placeholder="Describe what you see — approximate size of dump site, frequency of dumping, any other details..."></textarea>
+        <label class="form-label">Feedback / Description <span>*</span></label>
+        <textarea class="form-textarea" id="feedbackText" placeholder="Share your feedback, report an issue, or let us know how you'd like to volunteer..."></textarea>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Upload Photos <span>*</span></label>
+        <label class="form-label">Upload Photos</label>
         <div class="upload-zone" id="uploadZone">
           <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
           <div class="upload-icon">📷</div>
@@ -460,18 +451,7 @@ body[data-theme="dark"]::after {
         <div class="preview-grid" id="previewGrid"></div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
-          <input class="form-input" id="reporterName" placeholder="Anonymous if left blank" type="text">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contact (optional)</label>
-          <input class="form-input" id="reporterContact" placeholder="Phone or email" type="text">
-        </div>
-      </div>
-
-      <button class="submit-btn" onclick="submitReport()">Submit Report →</button>
+      <button class="submit-btn" onclick="submitFeedback()">Submit Feedback →</button>
     </div>
   </section>
 
@@ -618,36 +598,29 @@ function renderPreviews(){
 
 function removeFile(i){uploadedFiles.splice(i,1);renderPreviews();}
 
-/* ===== Severity ===== */
-let selectedSeverity='';
-function selectSeverity(btn,level){
-  document.querySelectorAll('.severity-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedSeverity=level;
-}
 
-/* ===== Report Submission ===== */
+
+/* ===== Feedback Submission ===== */
 let isSubmitting=false;
-async function submitReport(){
+async function submitFeedback(){
   if(isSubmitting)return;
   const loc=document.getElementById('locName').value.trim();
-  const type=document.getElementById('pollType').value;
-  const landmark=document.getElementById('landmark').value.trim();
-  const description=document.getElementById('description').value.trim();
-  const reporterName=document.getElementById('reporterName').value.trim()||'Anonymous';
+  const feedback=document.getElementById('feedbackText').value.trim();
+  const reporterName=document.getElementById('reporterName').value.trim();
   const contact=document.getElementById('reporterContact').value.trim();
+
+  if(!reporterName){showToast('Please enter your name.','error');return;}
+  if(!contact){showToast('Please enter your contact information.','error');return;}
 
   if (contact && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contact) && !/^\+?\d{10,14}$/.test(contact)) {
     showToast('Please enter a valid email or phone number.','error');
     return;
   }
 
-  if(!loc){showToast('Please enter a location name.','error');return;}
-  if(!type){showToast('Please select a pollution type.','error');return;}
-  if(!selectedSeverity){showToast('Please select a severity level.','error');return;}
-  if(uploadedFiles.length===0){showToast('Please upload at least one photo.','error');return;}
+  if(!loc){showToast('Please select a location.','error');return;}
+  if(!feedback){showToast('Please provide your feedback.','error');return;}
 
-  const submitBtn=document.querySelector('.submit-btn[onclick="submitReport()"]');
+  const submitBtn=document.querySelector('.submit-btn[onclick="submitFeedback()"]');
   isSubmitting=true;
   submitBtn.disabled=true;
   submitBtn.textContent='Uploading photos...';
@@ -662,14 +635,11 @@ async function submitReport(){
       photoURLs.push(url);
     }
 
-    submitBtn.textContent='Saving report...';
+    submitBtn.textContent='Saving feedback...';
 
     await db.collection('reports').add({
       location:loc,
-      landmark:landmark,
-      pollutionType:type,
-      severity:selectedSeverity,
-      description:description,
+      feedback:feedback,
       reporterName:reporterName,
       contact:contact,
       photoURLs:photoURLs,
@@ -679,25 +649,24 @@ async function submitReport(){
 
     document.getElementById('successBanner').style.display='block';
     document.getElementById('locName').value='';
-    document.getElementById('landmark').value='';
-    document.getElementById('pollType').value='';
-    document.getElementById('description').value='';
+    document.getElementById('feedbackText').value='';
     document.getElementById('reporterName').value='';
     document.getElementById('reporterContact').value='';
-    document.querySelectorAll('.severity-btn').forEach(b=>b.classList.remove('selected'));
-    selectedSeverity='';
+
     uploadedFiles=[];
     renderPreviews();
-    showToast('Report submitted successfully! 💚','success');
-    loadHeroStats();
-    setTimeout(()=>document.getElementById('successBanner').style.display='none',8000);
-  }catch(err){
-    console.error('Submit error:',err);
-    showToast('Failed to submit. Please check your connection and try again.','error');
+
+    setTimeout(()=>{
+      document.getElementById('successBanner').style.display='none';
+    },5000);
+
+  }catch(e){
+    console.error(e);
+    showToast('Failed to submit. Please try again.','error');
   }finally{
     isSubmitting=false;
     submitBtn.disabled=false;
-    submitBtn.textContent='Submit Report →';
+    submitBtn.textContent='Submit Feedback →';
   }
 }
 

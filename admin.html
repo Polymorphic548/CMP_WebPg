@@ -329,9 +329,8 @@ async function loadReports(){
 
       const time=d.timestamp?d.timestamp.toDate().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Unknown time';
       const photos=(d.photoURLs||[]).map(url=>`<img src="${url}" alt="Report photo" onclick="window.open('${url}','_blank')">`).join('');
-      const severityCls='severity-'+d.severity;
       const statusCls='status-'+d.status;
-
+      
       container.innerHTML+=`
         <div class="report-card">
           <div class="report-header">
@@ -339,14 +338,12 @@ async function loadReports(){
             <div class="report-time">${time}</div>
           </div>
           <div class="report-meta">
-            <span class="report-badge ${severityCls}">${d.severity?d.severity.toUpperCase():''} severity</span>
             <span class="report-badge ${statusCls}">${d.status||'pending'}</span>
-            <span class="report-badge" style="background:var(--bg);color:var(--text);">${escHtml(d.pollutionType||'')}</span>
           </div>
-          ${d.landmark?'<div class="report-desc"><strong>Landmark:</strong> '+escHtml(d.landmark)+'</div>':''}
+          ${d.feedback?'<div class="report-desc" style="font-style: italic;">"'+escHtml(d.feedback)+'"</div>':''}
           ${d.description?'<div class="report-desc">'+escHtml(d.description)+'</div>':''}
           ${photos?'<div class="report-photos">'+photos+'</div>':''}
-          <div class="report-reporter">Reported by: <strong>${escHtml(d.reporterName||'Anonymous')}</strong>${d.contact?' · '+escHtml(d.contact):''}</div>
+          <div class="report-reporter">Submitted by: <strong>${escHtml(d.reporterName||'Anonymous')}</strong>${d.contact?' · '+escHtml(d.contact):''}</div>
           <div class="report-actions">
             ${d.status!=='reviewed'?`<button class="btn btn-blue" onclick="updateReportStatus('${doc.id}','reviewed')">✓ Mark Reviewed</button>`:''}
             ${d.status!=='resolved'?`<button class="btn btn-green" onclick="updateReportStatus('${doc.id}','resolved')">✅ Mark Resolved</button>`:''}
