@@ -93,7 +93,7 @@ body::after {
 .lock-error{color:var(--red);font-size:0.85rem;margin-top:12px;display:none;font-weight:500;}
 
 /* Main content */
-.main{max-width:1200px;margin:0 auto;padding:28px 24px;display:none;}
+.main{width:100%;max-width:100%;margin:0 auto;padding:20px;display:none;flex:1;flex-direction:column;}
 
 /* Tabs */
 .admin-tabs-container{margin:0;}
@@ -149,9 +149,15 @@ body::after {
 .btn-red:hover{background:#991b1b;transform:translateY(-1px);}
 
 /* Volunteer table */
-.vol-table-wrapper{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-.vol-table{width:100%;border-collapse:collapse;background:var(--surface);}
+.vol-table-wrapper{border-radius:var(--radius);overflow:auto;flex:1;width:100%;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;}
+.vol-table{width:100%;border-collapse:collapse;table-layout:fixed;flex:0 0 auto;}
+.vol-table.empty-table{height:100%;flex:1;}
 .vol-table th{background:rgba(0,0,0,0.03);font-size:0.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:16px 20px;text-align:left;border-bottom:1px solid var(--border);}
+.vol-table th:nth-child(1){width:15%;}
+.vol-table th:nth-child(2){width:23%;}
+.vol-table th:nth-child(3){width:17%;}
+.vol-table th:nth-child(4){width:30%;}
+.vol-table th:nth-child(5){width:15%;}
 [data-theme="dark"] .vol-table th{background:rgba(255,255,255,0.03);}
 .vol-table td{padding:16px 20px;font-size:0.95rem;border-bottom:1px solid var(--border);transition:background 0.15s;}
 .vol-table tr:last-child td{border-bottom:none;}
@@ -159,6 +165,12 @@ body::after {
 
 .empty-state{text-align:center;padding:60px 24px;color:var(--muted);font-size:1rem;}
 .empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:0.8;}
+
+/* Image Modal */
+.modal{display:none;position:fixed;z-index:9999;padding-top:100px;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.8);backdrop-filter:blur(8px);}
+.modal-content{margin:auto;display:block;max-width:90%;max-height:80%;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+.modal-close{position:absolute;top:30px;right:40px;color:#f1f1f1;font-size:40px;font-weight:bold;transition:0.3s;cursor:pointer;}
+.modal-close:hover,.modal-close:focus{color:#bbb;text-decoration:none;cursor:pointer;}
 
 /* Footer */
 .footer{background:var(--text);color:rgba(255,255,255,0.7);text-align:center;padding:12px 24px;font-size:0.8rem;margin-top:auto;transition:background var(--transition);}
@@ -205,47 +217,28 @@ body::after {
 
 <!-- Main Admin Content (hidden until authenticated) -->
 <div class="main" id="adminMain">
-  
-  <div class="dashboard-controls">
-    <div class="stats-strip">
-      <div class="stat-card">
-        <div class="stat-num" id="statReports">—</div>
-        <div class="stat-label">Total Reports</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statPending">—</div>
-        <div class="stat-label">Pending Review</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statVolunteers">—</div>
-        <div class="stat-label">Total Volunteers</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statCampaigns">4</div>
-        <div class="stat-label">Active Campaigns</div>
-      </div>
-    </div>
-
-    <div class="admin-tabs-container">
-      <div class="admin-tabs">
-        <div class="admin-tab active" onclick="switchAdminTab('reports')">📍 Reports</div>
-        <div class="admin-tab" onclick="switchAdminTab('volunteers')">👥 Volunteers</div>
-      </div>
-    </div>
+  <div class="vol-table-wrapper">
+    <table class="vol-table" id="spreadsheetTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact Information</th>
+          <th>Location</th>
+          <th>Description (Feedback)</th>
+          <th>Photos Submitted</th>
+        </tr>
+      </thead>
+      <tbody id="reportList">
+        <tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div>Loading data...</div></td></tr>
+      </tbody>
+    </table>
   </div>
+</div>
 
-  <div class="admin-section active" id="sec-reports">
-    <div class="report-list" id="reportList">
-      <div class="empty-state"><div class="icon">📭</div>Loading reports...</div>
-    </div>
-  </div>
-
-  <div class="admin-section" id="sec-volunteers">
-    <div id="volunteerContent">
-      <div class="empty-state"><div class="icon">👥</div>Loading volunteers...</div>
-    </div>
-  </div>
-
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="closeModal(event)">
+  <span class="modal-close" onclick="closeModal(event)">&times;</span>
+  <img class="modal-content" id="modalImg">
 </div>
 
 <footer class="footer">
@@ -274,10 +267,9 @@ function unlockAdmin(){
   const input=document.getElementById('adminPass').value;
   if(input===ADMIN_PASSWORD){
     document.getElementById('lockScreen').style.display='none';
-    document.getElementById('adminMain').style.display='block';
+    document.getElementById('adminMain').style.display='flex';
     sessionStorage.setItem('adminUnlocked','true');
     loadReports();
-    loadAllVolunteers();
   }else{
     document.getElementById('lockError').style.display='block';
     document.getElementById('adminPass').value='';
@@ -288,20 +280,9 @@ function unlockAdmin(){
 // Auto-unlock if already authenticated this session
 if(sessionStorage.getItem('adminUnlocked')==='true'){
   document.getElementById('lockScreen').style.display='none';
-  document.getElementById('adminMain').style.display='block';
+  document.getElementById('adminMain').style.display='flex';
   // Load data after Firebase is ready
-  setTimeout(()=>{loadReports();loadAllVolunteers();},500);
-}
-
-/* ===== Tab Switching ===== */
-function switchAdminTab(tab){
-  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('sec-'+tab).classList.add('active');
-  document.querySelectorAll('.admin-tab').forEach((t,i)=>{
-    const map=['reports','volunteers'];
-    if(map[i]===tab)t.classList.add('active');
-  });
+  setTimeout(()=>{loadReports();},500);
 }
 
 /* ===== Load Reports ===== */
@@ -309,47 +290,31 @@ async function loadReports(){
   try{
     const snap=await db.collection('reports').orderBy('timestamp','desc').get();
     const container=document.getElementById('reportList');
-    document.getElementById('statReports').textContent=snap.size;
-
-    let pending=0;
-    snap.forEach(doc=>{
-      if(doc.data().status==='pending') pending++;
-    });
-    document.getElementById('statPending').textContent=pending;
+    const table=document.getElementById('spreadsheetTable');
 
     if(snap.empty){
-      container.innerHTML='<div class="empty-state"><div class="icon">📭</div>No reports submitted yet.</div>';
+      table.classList.add('empty-table');
+      container.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="icon">📭</div>No data submitted yet.</div></td></tr>';
       return;
     }
 
-    container.innerHTML='';
+    table.classList.remove('empty-table');
+    let rows='';
     const docsToRender = snap.docs.slice(0, 50);
     docsToRender.forEach(doc=>{
       const d=doc.data();
-
-      const time=d.timestamp?d.timestamp.toDate().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Unknown time';
-      const photos=(d.photoURLs||[]).map(url=>`<img src="${url}" alt="Report photo" onclick="window.open('${url}','_blank')">`).join('');
-      const statusCls='status-'+d.status;
+      const photosLinks = (d.photoURLs||[]).map((url, i) => `<a href="#" onclick="openModal('${url}'); return false;" style="color:var(--blue);text-decoration:underline;margin-right:8px;white-space:nowrap;">View Image ${i+1}</a>`).join('<br>');
       
-      container.innerHTML+=`
-        <div class="report-card">
-          <div class="report-header">
-            <div class="report-location">${escHtml(d.location)}</div>
-            <div class="report-time">${time}</div>
-          </div>
-          <div class="report-meta">
-            <span class="report-badge ${statusCls}">${d.status||'pending'}</span>
-          </div>
-          ${d.feedback?'<div class="report-desc" style="font-style: italic;">"'+escHtml(d.feedback)+'"</div>':''}
-          ${d.description?'<div class="report-desc">'+escHtml(d.description)+'</div>':''}
-          ${photos?'<div class="report-photos">'+photos+'</div>':''}
-          <div class="report-reporter">Submitted by: <strong>${escHtml(d.reporterName||'Anonymous')}</strong>${d.contact?' · '+escHtml(d.contact):''}</div>
-          <div class="report-actions">
-            ${d.status!=='reviewed'?`<button class="btn btn-blue" onclick="updateReportStatus('${doc.id}','reviewed')">✓ Mark Reviewed</button>`:''}
-            ${d.status!=='resolved'?`<button class="btn btn-green" onclick="updateReportStatus('${doc.id}','resolved')">✅ Mark Resolved</button>`:''}
-          </div>
-        </div>`;
+      rows+=`
+        <tr>
+          <td><strong>${escHtml(d.reporterName||'Anonymous')}</strong></td>
+          <td>${escHtml(d.contact||'—')}</td>
+          <td>${escHtml(d.location)}</td>
+          <td>${escHtml(d.feedback||d.description||'—')}</td>
+          <td>${photosLinks||'—'}</td>
+        </tr>`;
     });
+    container.innerHTML=rows;
 
   }catch(e){
     console.error('Error loading reports:',e);
@@ -366,41 +331,16 @@ async function updateReportStatus(docId,status){
   }
 }
 
-/* ===== Load Volunteers ===== */
-async function loadAllVolunteers(){
-  try{
-    const snap=await db.collection('volunteers').orderBy('registeredAt','desc').get();
-    const container=document.getElementById('volunteerContent');
-    document.getElementById('statVolunteers').textContent=snap.size;
+/* ===== Modal Logic ===== */
+function openModal(url) {
+  document.getElementById('modalImg').src = url;
+  document.getElementById('imageModal').style.display = 'block';
+}
 
-    if(snap.empty){
-      container.innerHTML='<div class="empty-state"><div class="icon">👥</div>No volunteers registered yet.</div>';
-      return;
-    }
-
-    let rows='';
-    const docsToRender = snap.docs.slice(0, 50);
-    docsToRender.forEach(doc=>{
-      const d=doc.data();
-      const time=d.registeredAt?d.registeredAt.toDate().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'—';
-      rows+=`<tr>
-        <td><strong>${escHtml(d.name)}</strong></td>
-        <td>${escHtml(d.contact)}</td>
-        <td>${escHtml(d.campaignName||d.campaignId)}</td>
-        <td>${time}</td>
-      </tr>`;
-    });
-
-    container.innerHTML=`
-      <div class="vol-table-wrapper">
-        <table class="vol-table">
-          <thead><tr><th>Name</th><th>Contact</th><th>Campaign</th><th>Registered</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
-  }catch(e){
-    console.error('Error loading volunteers:',e);
-    document.getElementById('volunteerContent').innerHTML='<div class="empty-state"><div class="icon">⚠️</div>Failed to load volunteers. Check Firebase configuration.</div>';
+function closeModal(event) {
+  if (event.target === document.getElementById('imageModal') || event.target.className === 'modal-close') {
+    document.getElementById('imageModal').style.display = 'none';
+    document.getElementById('modalImg').src = '';
   }
 }
 
