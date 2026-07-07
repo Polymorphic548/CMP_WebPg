@@ -592,10 +592,25 @@ function handleFiles(files){
   Array.from(files).slice(0,2-uploadedFiles.length).forEach(f=>{
     if(!f.type.startsWith('image/'))return;
     if(f.size>5*1024*1024){showToast('File "'+f.name+'" exceeds 5 MB limit.','error');return;}
+    
     const reader=new FileReader();
     reader.onload=e=>{
-      uploadedFiles.push({name:f.name,data:e.target.result,file:f});
-      renderPreviews();
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Keep exact original dimensions
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Compress as JPEG at 70% quality to reduce file size drastically
+        const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+        
+        uploadedFiles.push({name:f.name, data:compressedData});
+        renderPreviews();
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(f);
   });
@@ -650,16 +665,8 @@ async function submitFeedback(){
   try{
     const photoURLs=[];
     for(let i=0;i<uploadedFiles.length;i++){
-      const file = uploadedFiles[i].file;
-      const fileRef = storage.ref().child('reports/' + Date.now() + '_' + file.name);
-      
-      // Wrap put with a timeout since Firebase Storage hangs if not configured
-      const uploadTask = fileRef.put(file);
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Storage upload timed out. Is Firebase Storage enabled?")), 15000));
-      
-      await Promise.race([uploadTask, timeoutPromise]);
-      const url = await fileRef.getDownloadURL();
-      photoURLs.push(url);
+      // Store the compressed base64 string directly, no Firebase Storage needed
+      photoURLs.push(uploadedFiles[i].data);
     }
 
     submitBtn.textContent='Saving feedback...';
