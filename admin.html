@@ -339,7 +339,7 @@ async function loadReports(){
           <td><strong>${escHtml(d.reporterName||'Anonymous')}</strong></td>
           <td><span style="font-size:0.85rem;color:var(--muted);">${escHtml(d.contact||'—')}</span></td>
           <td>${escHtml(d.location)}</td>
-          <td>${escHtml(d.feedback||d.description||'—')}</td>
+          <td><div style="position:relative; left:-100px; display:inline-block;">${escHtml(d.feedback||d.description||'—')}</div></td>
           <td>${photosLinks||'—'}</td>
         </tr>`;
     });
