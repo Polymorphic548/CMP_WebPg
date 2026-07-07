@@ -252,6 +252,8 @@ body[data-theme="dark"]::after {
 .upload-text{font-size:0.9rem;color:var(--muted);}
 .upload-text strong{color:var(--green);}
 .upload-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
+.upload-zone.has-files .upload-icon, .upload-zone.has-files .upload-text, .upload-zone.has-files .upload-sub { display: none; }
+.upload-zone.has-files .preview-grid { margin-top: 0; }
 #fileInput{position:absolute;inset:0;opacity:0;cursor:pointer;}
 .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;}
 .preview-item{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
@@ -448,8 +450,8 @@ body[data-theme="dark"]::after {
           <div class="upload-icon">📷</div>
           <div class="upload-text"><strong>Click to upload</strong> or drag &amp; drop images here</div>
           <div class="upload-sub">JPG, PNG, WEBP — up to 2 photos, max 5 MB each</div>
+          <div class="preview-grid" id="previewGrid"></div>
         </div>
-        <div class="preview-grid" id="previewGrid"></div>
       </div>
 
       <button class="submit-btn" onclick="submitFeedback()">Submit Feedback →</button>
@@ -601,6 +603,14 @@ function handleFiles(files){
 
 function renderPreviews(){
   const grid=document.getElementById('previewGrid');
+  const zone=document.getElementById('uploadZone');
+  
+  if(uploadedFiles.length > 0) {
+    zone.classList.add('has-files');
+  } else {
+    zone.classList.remove('has-files');
+  }
+
   grid.innerHTML=uploadedFiles.map((f,i)=>`
     <div class="preview-item">
       <img src="${f.data}" alt="Upload ${i+1}">
@@ -635,14 +645,19 @@ async function submitFeedback(){
   const submitBtn=document.querySelector('.submit-btn[onclick="submitFeedback()"]');
   isSubmitting=true;
   submitBtn.disabled=true;
-  submitBtn.textContent='Uploading photos...';
+  submitBtn.textContent='Uploading...';
 
   try{
     const photoURLs=[];
     for(let i=0;i<uploadedFiles.length;i++){
       const file = uploadedFiles[i].file;
       const fileRef = storage.ref().child('reports/' + Date.now() + '_' + file.name);
-      await fileRef.put(file);
+      
+      // Wrap put with a timeout since Firebase Storage hangs if not configured
+      const uploadTask = fileRef.put(file);
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Storage upload timed out. Is Firebase Storage enabled?")), 15000));
+      
+      await Promise.race([uploadTask, timeoutPromise]);
       const url = await fileRef.getDownloadURL();
       photoURLs.push(url);
     }
