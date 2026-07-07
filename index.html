@@ -446,7 +446,7 @@ body[data-theme="dark"]::after {
       <div class="form-group">
         <label class="form-label">Upload Photos</label>
         <div class="upload-zone" id="uploadZone">
-          <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+          <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)" onclick="this.value=null">
           <div class="upload-icon">📷</div>
           <div class="upload-text"><strong>Click to upload</strong> or drag &amp; drop images here</div>
           <div class="upload-sub">JPG, PNG, WEBP — up to 2 photos, max 5 MB each</div>
