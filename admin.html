@@ -75,6 +75,20 @@ body::after {
 .back-link{color:rgba(255,255,255,0.8);text-decoration:none;font-size:0.88rem;padding:8px 14px;border-radius:6px;transition:background 0.15s;}
 .back-link:hover{background:rgba(255,255,255,0.15);color:#fff;}
 
+/* Header Stat */
+.header-stat{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);margin:0 auto 0 24px;}
+[data-theme="dark"] .header-stat{background:rgba(61,220,132,0.1);border-color:rgba(61,220,132,0.2);}
+.header-stat .stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:#7deba8;line-height:1;}
+[data-theme="dark"] .header-stat .stat-num{color:var(--green);}
+.header-stat .stat-label{font-size:0.75rem;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+[data-theme="dark"] .header-stat .stat-label{color:var(--text);}
+@media(max-width:640px){
+  .header-stat{padding:4px 10px; gap:4px; margin: 0 10px;}
+  .header-stat .stat-num{font-size: 1rem;}
+  .header-stat .stat-label{font-size: 0.65rem;}
+  .header-inner {flex-wrap: wrap;}
+}
+
 /* Dark mode toggle */
 .theme-toggle{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;width:44px;height:26px;cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0;}
 .theme-toggle::after{content:'☀️';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
@@ -197,6 +211,12 @@ body::after {
 <header class="header">
   <div class="header-inner">
     <div class="logo">Eco<span>Green</span> Admin</div>
+    
+    <div class="header-stat" id="headerStat" style="display:none;">
+      <div class="stat-num" id="statReports">0</div>
+      <div class="stat-label">People Reached</div>
+    </div>
+
     <div class="header-actions">
       <a href="index.html" class="back-link">← Back to Dashboard</a>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"></button>
@@ -267,6 +287,7 @@ function unlockAdmin(){
   if(input===ADMIN_PASSWORD){
     document.getElementById('lockScreen').style.display='none';
     document.getElementById('adminMain').style.display='flex';
+    document.getElementById('headerStat').style.display='flex';
     sessionStorage.setItem('adminUnlocked','true');
     loadReports();
   }else{
@@ -280,6 +301,7 @@ function unlockAdmin(){
 if(sessionStorage.getItem('adminUnlocked')==='true'){
   document.getElementById('lockScreen').style.display='none';
   document.getElementById('adminMain').style.display='flex';
+  document.getElementById('headerStat').style.display='flex';
   // Load data after Firebase is ready
   setTimeout(()=>{loadReports();},500);
 }
@@ -290,6 +312,9 @@ async function loadReports(){
     const snap=await db.collection('reports').orderBy('timestamp','desc').get();
     const container=document.getElementById('reportList');
     const table=document.getElementById('spreadsheetTable');
+
+    const statReportsEl = document.getElementById('statReports');
+    if(statReportsEl) statReportsEl.textContent = snap.size;
 
     if(snap.empty){
       table.classList.add('empty-table');
